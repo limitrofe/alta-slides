@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Alta</title>
+    <link rel="stylesheet" href="styles/tokens.css" />
+    <link rel="stylesheet" href="popup.css" />
+  </head>
+  <body class="popup">
+    <div class="inkbar" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+
+    <main class="popup__main">
+      <header class="brand">
+        <svg class="brand__mark" viewBox="0 0 32 32" aria-hidden="true">
+          <rect width="32" height="32" rx="7" fill="#1f47ff" />
+          <circle cx="16" cy="16" r="7.4" fill="none" stroke="#f4f1e8" stroke-width="1.7" />
+          <path d="M16 4.6v22.8M4.6 16h22.8" stroke="#f4f1e8" stroke-width="1.7" stroke-linecap="round" />
+          <circle cx="16" cy="16" r="1.9" fill="#f4f1e8" />
+        </svg>
+        <span class="brand__text">
+          <strong>Alta</strong>
+          <span>Exportador de slides</span>
+        </span>
+      </header>
+
+      <section class="deck" id="deck" hidden aria-labelledby="deckTitle">
+        <div class="deck__thumb" aria-hidden="true">
+          <svg viewBox="0 0 44 44">
+            <rect x="0.75" y="0.75" width="42.5" height="42.5" rx="3" fill="#fbf9f3" stroke="#d9d4c6" stroke-width="1.5" />
+            <rect x="8" y="12.5" width="28" height="18.5" rx="1" fill="none" stroke="#141816" stroke-width="1.4" />
+            <path d="M12 18h11M12 22h18M12 26h8" stroke="#b8b2a2" stroke-width="1.4" stroke-linecap="round" />
+            <rect x="27" y="26" width="13" height="12" rx="1.2" fill="#1f47ff" />
+            <text x="33.5" y="34.7" text-anchor="middle" font-family="Archivo, sans-serif" font-size="7.2" font-weight="700" fill="#ffffff">2×</text>
+          </svg>
+        </div>
+        <div class="deck__meta">
+          <p class="deck__source"><span class="dot" aria-hidden="true"></span>Google Slides</p>
+          <h1 class="deck__title" id="deckTitle"></h1>
+        </div>
+      </section>
+
+      <section class="empty" id="empty" hidden>
+        <svg class="empty__art" viewBox="0 0 84 84" aria-hidden="true">
+          <path d="M10 24V11h13M74 24V11H61M10 60v13h13M74 60v13H61" fill="none" stroke="#1f47ff" stroke-width="1.7" stroke-linecap="round" />
+          <rect x="18" y="26" width="48" height="32" rx="1.5" fill="#fbf9f3" stroke="#141816" stroke-width="1.6" />
+          <path d="M25 34h16M25 40h28M25 46h12" stroke="#b8b2a2" stroke-width="1.6" stroke-linecap="round" />
+          <circle cx="55" cy="48" r="6" fill="none" stroke="#1f47ff" stroke-width="1.6" />
+          <path d="M55 39v18M46 48h18" stroke="#1f47ff" stroke-width="1.6" stroke-linecap="round" />
+        </svg>
+        <h1 class="empty__title" id="emptyTitle">Abra uma apresentação</h1>
+        <p class="empty__text" id="emptyText">Entre em um deck no editor do Google Slides e clique no ícone da Alta para começar.</p>
+        <a class="btn btn--primary empty__cta" id="emptyCta" href="https://slides.google.com" target="_blank" rel="noopener">Abrir Google Slides</a>
+      </section>
+
+      <form class="settings" id="exportForm" hidden novalidate>
+        <div class="setting">
+          <div class="setting__label" id="dpiLabel">
+            <span>Resolução</span>
+            <small>Pontos por polegada</small>
+          </div>
+          <div class="seg" role="radiogroup" aria-labelledby="dpiLabel">
+            <label><input type="radio" name="dpi" value="150" aria-label="150 dpi" /><span>150</span></label>
+            <label><input type="radio" name="dpi" value="300" aria-label="300 dpi" /><span>300</span></label>
+            <label><input type="radio" name="dpi" value="600" aria-label="600 dpi" /><span>600</span></label>
+          </div>
+        </div>
+
+        <div class="setting">
+          <div class="setting__label" id="scaleLabel">
+            <span>Tamanho</span>
+            <small>do slide original</small>
+          </div>
+          <div class="seg" role="radiogroup" aria-labelledby="scaleLabel">
+            <label><input type="radio" name="scale" value="1" aria-label="Tamanho original" /><span>1×</span></label>
+            <label><input type="radio" name="scale" value="2" aria-label="Duas vezes o tamanho" /><span>2×</span></label>
+            <label><input type="radio" name="scale" value="3" aria-label="Três vezes o tamanho" /><span>3×</span></label>
+          </div>
+        </div>
+
+        <div class="setting">
+          <div class="setting__label" id="formatLabel">
+            <span>Formato</span>
+            <small>PNG ou JPG</small>
+          </div>
+          <div class="seg" role="radiogroup" aria-labelledby="formatLabel">
+            <label><input type="radio" name="format" value="png" aria-label="PNG, sem perdas" /><span>PNG</span></label>
+            <label><input type="radio" name="format" value="jpg" aria-label="JPG, arquivo menor" /><span>JPG</span></label>
+          </div>
+        </div>
+
+        <div class="setting setting--last">
+          <label class="setting__label" for="zipToggle">
+            <span>Juntar em um ZIP</span>
+            <small>Um único download</small>
+          </label>
+          <label class="switch">
+            <input type="checkbox" id="zipToggle" name="zip" />
+            <span class="switch__track" aria-hidden="true"></span>
+          </label>
+        </div>
+
+        <p class="estimate" id="estimate"></p>
+        <p class="form-error" id="formError" hidden role="alert"></p>
+        <button class="btn btn--primary export" id="exportBtn" type="submit">Exportar apresentação</button>
+      </form>
+
+      <p class="fineprint">
+        <svg viewBox="0 0 16 16" aria-hidden="true">
+          <path d="M8 1.5 13 3v4.4c0 3.2-2.1 5.7-5 7.1-2.9-1.4-5-3.9-5-7.1V3l5-1.5Z" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round" />
+          <path d="m5.7 7.6 1.6 1.6 3-3.2" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+        Renderizado no seu navegador
+      </p>
+    </main>
+
+    <script type="module" src="popup.js"></script>
+  </body>
+</html>

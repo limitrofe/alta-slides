@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Alta — exportar slides</title>
+    <link rel="stylesheet" href="styles/tokens.css" />
+    <link rel="stylesheet" href="renderer.css" />
+  </head>
+  <body class="export" data-state="boot">
+    <a class="skip-link" href="#preview">Ir para a prévia</a>
+    <div class="inkbar" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+
+    <header class="topbar">
+      <div class="brand">
+        <svg class="brand__mark" viewBox="0 0 32 32" aria-hidden="true">
+          <rect width="32" height="32" rx="7" fill="#1f47ff" />
+          <circle cx="16" cy="16" r="7.4" fill="none" stroke="#f4f1e8" stroke-width="1.7" />
+          <path d="M16 4.6v22.8M4.6 16h22.8" stroke="#f4f1e8" stroke-width="1.7" stroke-linecap="round" />
+          <circle cx="16" cy="16" r="1.9" fill="#f4f1e8" />
+        </svg>
+        <span class="brand__name">Alta</span>
+        <span class="brand__sep" aria-hidden="true"></span>
+        <span class="brand__tag">Exportador de slides</span>
+      </div>
+      <p class="privacy">
+        <svg viewBox="0 0 16 16" aria-hidden="true">
+          <path d="M8 1.5 13 3v4.4c0 3.2-2.1 5.7-5 7.1-2.9-1.4-5-3.9-5-7.1V3l5-1.5Z" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round" />
+          <path d="m5.7 7.6 1.6 1.6 3-3.2" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+        Renderização local
+      </p>
+    </header>
+
+    <main class="shell">
+      <section class="hero" aria-labelledby="deckTitle">
+        <div class="hero__main">
+          <p class="kicker" id="kicker">Preparando</p>
+          <h1 class="hero__title" id="deckTitle">Preparando os slides…</h1>
+          <div class="status">
+            <div class="status__line">
+              <p class="status__text" id="statusText" role="status" aria-live="polite">Conectando ao Google Slides</p>
+              <span class="status__count" id="progressCount"></span>
+            </div>
+            <p class="status__detail" id="statusDetail" hidden></p>
+            <div
+              class="bar"
+              id="barWrap"
+              role="progressbar"
+              aria-label="Progresso da exportação"
+              aria-valuemin="0"
+              aria-valuemax="100"
+              aria-valuenow="0"
+            >
+              <span id="bar"></span>
+            </div>
+          </div>
+          <div class="actions" id="actions"></div>
+          <p class="tab-note" id="tabNote" hidden>
+            Mantenha esta aba visível até o fim — o Chrome pausa a renderização em segundo plano.
+          </p>
+        </div>
+
+        <aside class="spec" id="spec" aria-label="Especificações da exportação">
+          <p class="spec__kicker">Especificação</p>
+          <dl class="spec__list">
+            <div class="spec__row"><dt>Resolução</dt><dd id="specDpi">—</dd></div>
+            <div class="spec__row"><dt>Tamanho</dt><dd id="specScale">—</dd></div>
+            <div class="spec__row"><dt>Dimensões</dt><dd id="specDims">—</dd></div>
+            <div class="spec__row"><dt>Impressão</dt><dd id="specPrint">—</dd></div>
+            <div class="spec__row"><dt>Páginas</dt><dd id="specPages">—</dd></div>
+            <div class="spec__row"><dt>Formato</dt><dd id="specFormat">—</dd></div>
+          </dl>
+          <p class="spec__note" id="specNote" hidden></p>
+        </aside>
+      </section>
+
+      <section class="sheet" id="preview" hidden>
+        <header class="sheet__head">
+          <h2>Prévia dos slides</h2>
+          <p id="sheetMeta">As imagens aparecem aqui conforme são renderizadas.</p>
+        </header>
+        <div class="grid" id="grid"></div>
+      </section>
+
+      <footer class="foot">
+        <span>Alta · slides em alta resolução</span>
+        <span id="footNote">300 dpi · 2×</span>
+      </footer>
+    </main>
+
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+    <canvas id="renderCanvas" class="visually-hidden" aria-hidden="true"></canvas>
+
+    <script src="vendor/pdf.min.js"></script>
+    <script type="module" src="renderer.js"></script>
+  </body>
+</html>

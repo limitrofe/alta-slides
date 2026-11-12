@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <title>Alta render test</title>
+    <style>
+      body { font-family: monospace; padding: 24px; background: #f4f1e8; color: #141816; }
+      pre { white-space: pre-wrap; font-size: 13px; }
+      canvas { width: 480px; height: auto; border: 1px solid #ccc; }
+    </style>
+  </head>
+  <body>
+    <h1>Render test</h1>
+    <pre id="result">running…</pre>
+    <canvas id="canvas"></canvas>
+    <script src="../vendor/pdf.min.js"></script>
+    <script type="module">
+      import { setPngDpi } from "../lib/png-dpi.js";
+      import { crc32 } from "../lib/crc32.js";
+
+      const result = document.getElementById("result");
+      const out = { status: "running" };
+
+      try {
+        pdfjsLib.GlobalWorkerOptions.workerSrc = "../vendor/pdf.worker.min.js";
+        const pdfFile = new URLSearchParams(location.search).get("pdf") || "alta-sample.pdf";
+        const pdf = await pdfjsLib.getDocument({
+          url: `../test/fixtures/${pdfFile}`,
+          cMapUrl: "../vendor/cmaps/",
+          cMapPacked: true,
+          standardFontDataUrl: "../vendor/standard_fonts/",
+          isEvalSupported: false,
+        }).promise;
+
+        const page = await pdf.getPage(1);
+        const base = page.getViewport({ scale: 1 });
+        const dpi = 300;
+        const multiplier = 2;
+        const renderScale = (dpi / 72) * multiplier;
+        const viewport = page.getViewport({ scale: renderScale });
+        const canvas = document.getElementById("canvas");
+        canvas.width = Math.round(viewport.width);
+        canvas.height = Math.round(viewport.height);
+        const ctx = canvas.getContext("2d", { alpha: false });
+        ctx.fillStyle = "#ffffff";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        await page.render({ canvasContext: ctx, viewport, background: "#ffffff" }).promise;
+
+        const blob = await new Promise((resolve, reject) =>
+          canvas.toBlob((value) => (value ? resolve(value) : reject(new Error("toBlob null"))), "image/png"),
+        );
+        const raw = new Uint8Array(await blob.arrayBuffer());
+        const patched = setPngDpi(raw, 300);
+        const view = new DataView(patched.buffer, patched.byteOffset);
+        const physOffset = findPhys(patched);
+        const ppu = physOffset ? view.getUint32(physOffset + 8) : 0;
+        const physCrc = physOffset ? view.getUint32(physOffset + 17) : 0;
+        out.status = "ok";
+        out.pages = pdf.numPages;
+        out.pageSizePt = [Math.round(base.width * 100) / 100, Math.round(base.height * 100) / 100];
+        out.pageSizeIn = [Math.round((base.width / 72) * 1000) / 1000, Math.round((base.height / 72) * 1000) / 1000];
+        out.canvas = [canvas.width, canvas.height];
+        out.expectedDpi = dpi;
+        out.pixelWidthAt300Dpi = Math.round((base.width / 72) * 300);
+        out.pngBytes = raw.length;
+        out.patchedBytes = patched.length;
+        out.physPpu = ppu;
+        out.physDpi = Math.round((ppu / 39.37007874015748) * 100) / 100;
+        out.pendingCrcOk = physCrc === crc32(patched.subarray(physOffset + 4, physOffset + 17));
+        out.worker = Boolean(pdfjsLib.GlobalWorkerOptions.workerSrc);
+        result.textContent = JSON.stringify(out, null, 2);
+        document.title = "DONE";
+      } catch (error) {
+        out.status = "error";
+        out.error = String(error?.stack || error);
+        result.textContent = JSON.stringify(out, null, 2);
+        document.title = "ERROR";
+      }
+
+      function findPhys(bytes) {
+        let offset = 8;
+        while (offset + 12 <= bytes.length) {
+          const length =
+            ((bytes[offset] << 24) | (bytes[offset + 1] << 16) | (bytes[offset + 2] << 8) | bytes[offset + 3]) >>> 0;
+          const type = String.fromCharCode(bytes[offset + 4], bytes[offset + 5], bytes[offset + 6], bytes[offset + 7]);
+          if (type === "pHYs") return offset;
+          if (type === "IEND") break;
+          offset += 12 + length;
+        }
+        return 0;
+      }
+    </script>
+  </body>
+</html>

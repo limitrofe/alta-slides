@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Alta — preview da exportação</title>
+    <link rel="stylesheet" href="../styles/tokens.css" />
+    <link rel="stylesheet" href="../renderer.css" />
+  </head>
+  <body class="export" data-state="boot">
+    <div id="host"></div>
+    <script src="../vendor/pdf.min.js"></script>
+    <script>
+      const nativeFetch = window.fetch.bind(window);
+      const tabID = 1;
+      const job = {
+        id: "preview",
+        docId: "1AbCdEfGhIjKlMnOpQrStUvWxYz0123456789",
+        tabId: tabID,
+        title: "Plano 2027 — Varejo",
+        settings: { dpi: 300, scale: 2, format: "png", zip: true },
+        createdAt: Date.now(),
+      };
+
+      window.chrome = {
+        runtime: {
+          id: "preview",
+          getURL: (path) => `../${path}`,
+        },
+        storage: {
+          session: {
+            get: async (key) => ({ [key]: job }),
+            remove: async () => {},
+          },
+        },
+        tabs: {
+          getCurrent: async () => ({ id: 99, windowId: 1 }),
+          get: async () => ({ id: tabID, windowId: 1 }),
+          update: async () => ({}),
+          remove: async () => {},
+          create: async () => ({}),
+          sendMessage: async () => {
+            throw new Error("sem aba");
+          },
+        },
+        windows: { update: async () => ({}) },
+        scripting: { executeScript: async () => [] },
+        downloads: {
+          download: async ({ url, filename }) => {
+            const blob = await nativeFetch(url).then((response) => response.blob());
+            window.__downloads = window.__downloads || [];
+            window.__downloads.push({ filename, size: blob.size, type: blob.type });
+            return window.__downloads.length;
+          },
+          showDefaultFolder: () => {
+            window.__folderOpened = true;
+          },
+        },
+      };
+
+      window.fetch = async (input, init) => {
+        const url = typeof input === "string" ? input : input.url;
+        if (url.includes("docs.google.com/presentation/") && url.includes("/export/pdf")) {
+          const response = await nativeFetch("../test/fixtures/preview-deck.pdf");
+          const buffer = await response.arrayBuffer();
+          return new Response(buffer, {
+            status: 200,
+            headers: { "content-type": "application/pdf" },
+          });
+        }
+        return nativeFetch(input, init);
+      };
+
+      (async () => {
+        const html = await (await fetch("../renderer.html")).text();
+        const parsed = new DOMParser().parseFromString(html, "text/html");
+        const host = document.getElementById("host");
+        for (const child of [...parsed.body.children]) {
+          if (child.tagName === "SCRIPT") continue;
+          host.append(document.importNode(child, true));
+        }
+        await import("../renderer.js");
+      })();
+    </script>
+  </body>
+</html>

@@ -1,0 +1,36 @@
+{
+  "manifest_version": 3,
+  "name": "Alta — Slides em 300 dpi",
+  "short_name": "Alta",
+  "version": "1.0.0",
+  "description": "Exporte todos os slides do Google Slides como imagens em alta resolução: 300 dpi e 2× o tamanho original.",
+  "minimum_chrome_version": "110",
+  "permissions": ["downloads", "scripting", "storage"],
+  "host_permissions": ["https://docs.google.com/*", "https://*.googleusercontent.com/*"],
+  "action": {
+    "default_title": "Alta — exportar slides",
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "assets/icons/icon16.png",
+      "32": "assets/icons/icon32.png",
+      "48": "assets/icons/icon48.png",
+      "128": "assets/icons/icon128.png"
+    }
+  },
+  "icons": {
+    "16": "assets/icons/icon16.png",
+    "32": "assets/icons/icon32.png",
+    "48": "assets/icons/icon48.png",
+    "128": "assets/icons/icon128.png"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://docs.google.com/presentation/*"],
+      "js": ["content.js"],
+      "run_at": "document_idle"
+    }
+  ],
+  "content_security_policy": {
+    "extension_pages": "script-src 'self' 'wasm-unsafe-eval'; object-src 'self'"
+  }
+}

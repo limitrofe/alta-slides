@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Alta — preview do popup</title>
+    <link rel="stylesheet" href="../styles/tokens.css" />
+    <link rel="stylesheet" href="../popup.css" />
+    <style>
+      html { background: #d8d4c8; }
+      body.popup { margin: 0 auto; box-shadow: 0 0 0 1px rgba(20, 24, 22, 0.12); }
+    </style>
+  </head>
+  <body class="popup">
+    <div id="host"></div>
+    <script>
+      const params = new URLSearchParams(location.search);
+      const isSlides = !params.has("empty");
+      const url = isSlides
+        ? "https://docs.google.com/presentation/d/1AbCdEfGhIjKlMnOpQrStUvWxYz0123456789/edit"
+        : "https://docs.google.com/document/d/1AbCdEfGhIjKlMnOpQrStUvWxYz0123456789/edit";
+      const title = isSlides ? "Plano 2027 — Varejo - Google Slides" : "Documento sem título - Google Docs";
+
+      window.chrome = {
+        tabs: {
+          query: async () => [{ id: 1, url, title }],
+          create: async () => ({ id: 2 }),
+        },
+        storage: {
+          local: {
+            get: async () => ({
+              settings: {
+                dpi: Number(params.get("dpi")) || 300,
+                scale: Number(params.get("scale")) || 2,
+                format: params.get("format") || "png",
+                zip: params.get("zip") !== "0",
+              },
+            }),
+            set: async () => {},
+          },
+          session: { set: async () => {} },
+        },
+        runtime: { getURL: (path) => `../${path}`, id: "preview" },
+      };
+
+      (async () => {
+        const html = await (await fetch("../popup.html")).text();
+        const parsed = new DOMParser().parseFromString(html, "text/html");
+        const host = document.getElementById("host");
+        for (const child of [...parsed.body.children]) {
+          if (child.tagName === "SCRIPT") continue;
+          host.append(document.importNode(child, true));
+        }
+        await import("../popup.js");
+      })();
+    </script>
+  </body>
+</html>

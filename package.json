@@ -1,0 +1,11 @@
+{
+  "name": "alta-slides",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Extensão do Chrome para exportar slides do Google Slides em 300 dpi.",
+  "scripts": {
+    "test": "node --test test/*.test.js",
+    "zip": "rm -rf dist && mkdir -p dist/alta-slides && cp -R manifest.json popup.html popup.css popup.js renderer.html renderer.css renderer.js content.js assets lib styles vendor README.md LICENSE dist/alta-slides/ && find dist/alta-slides -name '.DS_Store' -delete && cd dist && zip -qr alta-slides-1.0.0.zip alta-slides"
+  }
+}
