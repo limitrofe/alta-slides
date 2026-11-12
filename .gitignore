@@ -1,4 +1,4 @@
 .DS_Store
-dist/
+dist/alta-slides/
 node_modules/
 *.log

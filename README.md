@@ -6,6 +6,16 @@ O PDF da apresentação é baixado pelo próprio mecanismo de exportação do Go
 
 ---
 
+## Download
+
+Baixe a versão pronta para instalar: **[alta-slides-1.0.0.zip](dist/alta-slides-1.0.0.zip)**.
+
+Descompacte e carregue a pasta `alta-slides` em `chrome://extensions` com o **Modo do desenvolvedor** ativado. O passo a passo completo está em [Instalar](#instalar).
+
+O checksum SHA-256 fica em [alta-slides-1.0.0.zip.sha256](dist/alta-slides-1.0.0.zip.sha256).
+
+---
+
 ## Instalar
 
 A extensão não está publicada na Chrome Web Store. Para usar agora:
